@@ -9,6 +9,7 @@ import FramerLogo from "@/assets/framer-logo.svg";
 import Container from "@/components/container";
 import useDisableScroll from "@/utils/use-disable-scroll";
 import ArrowRight from "@/assets/arrow-right.svg";
+import { ThemeToggle } from "@/components/toggle checkbox";
 
 const headerData = [
   {
