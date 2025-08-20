@@ -50,6 +50,7 @@ const slides: Slide[] = [
     image: "/slide-3.jpg",
   },
 ];
+
 const Home = () => {
   return (
     <Container>

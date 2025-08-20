@@ -8,8 +8,7 @@ import Menu from "@/assets/menu.svg";
 import FramerLogo from "@/assets/framer-logo.svg";
 import Container from "@/components/container";
 import useDisableScroll from "@/utils/use-disable-scroll";
-import ArrowRight from "@/assets/arrow-right.svg";
-import { ThemeToggle } from "@/components/toggle checkbox";
+import MenuLink from "@/components/menu-link";
 
 const headerData = [
   {
@@ -46,27 +45,18 @@ const Header = () => {
           <div>
             <FramerLogo width={32} />
           </div>
-          <LayoutGroup id="underline">
+          <LayoutGroup id="active-bubble">
             <nav className="gap-4 hidden md:flex">
               {headerData.map((link) => {
                 const isActive = pathname === link.url;
                 return (
-                  <Link
-                    href={link.url}
+                  <MenuLink
                     key={link.id}
-                    className={`block py-4 px-6 rounded-full font-bold relative transition-all duration-300 delay-100 ${
-                      isActive ? "text-foreground" : "text-background"
-                    }`}
-                  >
-                    {isActive && (
-                      <motion.div
-                        className="absolute block w-full h-full bg-background top-0 left-0 right-0 bottom-0 rounded-full"
-                        layoutId="underline"
-                        style={{ originY: "0px" }}
-                      />
-                    )}
-                    <div className="relative z-1">{link.label}</div>
-                  </Link>
+                    href={link.url}
+                    isActive={isActive}
+                    label={link.label}
+                    layoutId="active-bubble"
+                  />
                 );
               })}
             </nav>
@@ -82,52 +72,50 @@ const Header = () => {
 
       <AnimatePresence>
         {isOpen && (
-          <motion.div
-            key="sidebar"
-            initial={{ x: "100%" }}
-            animate={{ x: "-16px" }}
-            exit={{ x: "100%" }}
-            className="fixed bottom-28 right-0 z-20 w-64 shadow-lg overflow-hidden"
-          >
-            <div className="relative bg-foreground text-background p-4 rounded-xl w-full">
-              {headerData.map((link) => {
-                const isActive = pathname === link.url;
-                return (
-                  <Link
-                    href={link.url}
-                    key={link.id}
-                    className={`block py-4 px-6 rounded-full font-bold relative transition-all duration-300 delay-100 ${
-                      isActive ? "text-foreground" : "text-background"
-                    }`}
-                    onClick={() => setIsOpen(false)}
-                  >
-                    {isActive && (
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="absolute block w-full h-full bg-background top-0 left-0 right-0 bottom-0 rounded-full"
-                      />
-                    )}
-                    <div className="relative z-1">{link.label}</div>
-                  </Link>
-                );
-              })}
-              <div className="absolute bg-foreground -left-10 bottom-10">
-                <ArrowRight width={24} />
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsOpen(false)}
+              className="z-11 fixed bg-black/10 inset-0"
+            ></motion.div>
+            <motion.div
+              key="sidebar"
+              initial={{ x: "100%" }}
+              animate={{ x: "-16px" }}
+              exit={{ x: "100%" }}
+              className={`fixed right-0 w-[calc(100%-32px)] z-20 shadow-lg overflow-hidden
+              ${isHeaderInView ? "top-18" : "top-4"}
+              `}
+            >
+              <div className="relative bg-foreground text-background p-4 rounded-xl w-full">
+                {headerData.map((link) => {
+                  const isActive = pathname === link.url;
+                  return (
+                    <MenuLink
+                      key={link.id}
+                      href={link.url}
+                      isActive={isActive}
+                      label={link.label}
+                      layoutId=""
+                      onClick={() => setIsOpen(false)}
+                    />
+                  );
+                })}
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
 
       <motion.div
-        drag="x"
-        dragConstraints={{ left: 0, right: 0 }}
+        drag
+        dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
         dragElastic={0.1}
-        initial={{ x: 300, opacity: 0 }}
+        initial={{ scale: 0, opacity: 0 }}
         animate={{
-          x: isHeaderInView ? 300 : 0,
+          scale: isHeaderInView ? 0 : 1,
           opacity: isHeaderInView ? 0 : 1,
           pointerEvents: isHeaderInView ? "none" : "auto",
         }}
@@ -136,11 +124,11 @@ const Header = () => {
           if (info.offset.x > 20) {
             setIsOpen(false);
           } else if (info.offset.x < -20) {
-            console.log("open");
             setIsOpen(true);
           }
         }}
-        className="z-10 fixed bottom-12 -right-[900px] bg-foreground text-background w-[1000px] h-11 rounded-l-lg p-2 cursor-grab active:cursor-grabbing"
+        onClick={() => setIsOpen((prev) => !prev)}
+        className="z-11 fixed bottom-12 right-4 w-11 h-11 p-2 flex items-center justify-center bg-foreground text-background rounded-full cursor-grab active:cursor-grabbing"
       >
         <Menu width={24} />
       </motion.div>
